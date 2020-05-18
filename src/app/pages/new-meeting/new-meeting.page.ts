@@ -21,6 +21,5 @@ export class NewMeetingPage implements OnInit {
     if (this.qrEncodedString) {
       this.qrGenerated = true;
     }
-
   }
 }

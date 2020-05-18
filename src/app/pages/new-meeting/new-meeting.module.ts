@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { NewMeetingPageRoutingModule } from './new-meeting-routing.module';
 
 import { NewMeetingPage } from './new-meeting.page';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    NewMeetingPageRoutingModule
+    NewMeetingPageRoutingModule,
+    NgxQRCodeModule,
   ],
   declarations: [NewMeetingPage]
 })

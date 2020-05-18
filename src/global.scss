@@ -24,3 +24,11 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+
+// did not work when I put into new-meeting.page.scss file...
+.qrcode-image img {
+    width: 90vw;
+    height: 90vw;
+    margin-left: 5vw;
+}

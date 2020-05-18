@@ -24,8 +24,7 @@
       <ion-button (click)="generateQRCode()">Create and Display QR Code</ion-button>
     </ion-item>
     <!-- debugging -->
-    <ion-item *ngIf="qrGenerated">
-      {{qrEncodedString}}
-    </ion-item>
+      <!-- {{qrEncodedString}} -->
   </ion-list>
+  <ngx-qrcode *ngIf="qrGenerated" cssClass="qrcode-image" [elementType]="'img'" [value]="qrEncodedString"></ngx-qrcode>
 </ion-content>
