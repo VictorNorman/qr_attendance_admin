@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add New Course</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Course Name</ion-label>
+      <ion-input type="text" [(ngModel)]="courseName"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Admin Email Address</ion-label>
+      <ion-input type="text" [(ngModel)]="adminEmail"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Password</ion-label>
+      <ion-input type="password" [(ngModel)]="password"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Notes</ion-label>
+      <ion-input type="text" [(ngModel)]="notes"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-button (click)="done()">
+        Submit
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

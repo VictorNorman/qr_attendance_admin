@@ -1,20 +1,50 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      QR Code Attendance Admin
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="3" class="coursesList">
+        <ion-item>
+          <h2>Courses</h2>
+          <ion-button slot="end" (click)="openNewCourseModal()">
+            <ion-icon name="add"></ion-icon>
+            Add Course
+          </ion-button>
+        </ion-item>
+        <ion-item *ngFor="let course of courses">
+          <ion-label>
+            {{course.name}}
+          </ion-label>
+          <ion-checkbox [(ngModel)]="course.isChecked" (ionChange)="selectionChanged()">
+          </ion-checkbox>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <div>
+          <h2>Previous Meetings</h2>
+          <ion-note>
+            Area for showing previous meetings
+          </ion-note>
+        </div>
+          <ion-button slot="end">
+            <ion-icon name="add"></ion-icon>
+            Add Meeting
+          </ion-button>
+        </ion-item>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+        <div *ngIf="meetings">
+          <ion-item *ngFor="let meeting of meetings">
+            {{meeting.courseName + ' - ' + meeting.notes + ' - ' + meeting.date + ' - ' + meeting.numberOfAttendees}}
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
