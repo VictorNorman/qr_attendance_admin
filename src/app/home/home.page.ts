@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CoursesService } from '../services/courses.service';
-import { ModalController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 import { NewCourseModalPage } from '../page/new-course-modal/new-course-modal.page';
 import { MeetingsService } from '../services/meetings.service';
 import { Subscription } from 'rxjs';
@@ -26,6 +26,7 @@ export class HomePage {
     private cSvc: CoursesService,
     private mSvc: MeetingsService,
     private mCtrl: ModalController,
+    private nCtrl: NavController,
   ) {
     // Get the list of courses from the service, once it has gotten them
     // from the database.
@@ -66,8 +67,16 @@ export class HomePage {
     });
     await newCourseModal.present();
     const { data } = await newCourseModal.onDidDismiss();
-    console.log('newCourseData = ', data);
-    // call service to add new course data to db
-    this.cSvc.addNewCourse(data.courseName, data.adminEmail, data.password, data.notes);
+    // console.log('newCourseData = ', data);
+    if (data.courseName !== '') {
+      // call service to add new course data to db
+      this.cSvc.addNewCourse(data.courseName, data.adminEmail, data.password, data.notes);
+
+      // TODO: force this page to update to show the new course.
+    }
+  }
+
+  public addNewMeeting() {
+    this.nCtrl.navigateForward('new-meeting');
   }
 }

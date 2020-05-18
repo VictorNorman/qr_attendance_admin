@@ -15,6 +15,10 @@ const routes: Routes = [
     path: 'new-course-modal',
     loadChildren: () => import('./page/new-course-modal/new-course-modal.module').then( m => m.NewCourseModalPageModule)
   },
+  {
+    path: 'new-meeting',
+    loadChildren: () => import('./pages/new-meeting/new-meeting.module').then( m => m.NewMeetingPageModule)
+  },
 ];
 
 @NgModule({

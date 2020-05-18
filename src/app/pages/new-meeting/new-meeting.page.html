@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Create New Meeting</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Meeting Description / Notes</ion-label>
+      <ion-input type="textarea" [(ngModel)]="notes">
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Text to encode in a QR</ion-label>
+      <ion-input type="password" [(ngModel)]="qrEncodedString"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>(Optional) Close QR window automatically after: </ion-label>
+      <ion-input type="number" placeholder="3" [(ngModel)]="duration"></ion-input>
+      <ion-label>minutes</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-button (click)="generateQRCode()">Create and Display QR Code</ion-button>
+    </ion-item>
+    <!-- debugging -->
+    <ion-item *ngIf="qrGenerated">
+      {{qrEncodedString}}
+    </ion-item>
+  </ion-list>
+</ion-content>
