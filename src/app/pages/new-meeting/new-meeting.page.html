@@ -26,5 +26,5 @@
     <!-- debugging -->
       <!-- {{qrEncodedString}} -->
   </ion-list>
-  <ngx-qrcode *ngIf="qrGenerated" cssClass="qrcode-image" [elementType]="'img'" [value]="qrEncodedString"></ngx-qrcode>
+  <ngx-qrcode *ngIf="qrGenerated" [width]="700" [elementType]="'img'" [value]="qrEncodedString"></ngx-qrcode>
 </ion-content>
