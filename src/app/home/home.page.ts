@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CoursesService } from '../services/courses.service';
-import { ModalController, NavController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { NewCourseModalPage } from '../page/new-course-modal/new-course-modal.page';
 import { MeetingsService } from '../services/meetings.service';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { SelectedCoursesService } from '../services/selected-courses.service';
 
 interface CourseInfo {
   name: string;
@@ -26,7 +28,8 @@ export class HomePage {
     private cSvc: CoursesService,
     private mSvc: MeetingsService,
     private mCtrl: ModalController,
-    private nCtrl: NavController,
+    private router: Router,
+    private selCoursesSvc: SelectedCoursesService,
   ) {
     // Get the list of courses from the service, once it has gotten them
     // from the database.
@@ -50,6 +53,8 @@ export class HomePage {
   // run each time the user clicks or unclicks a course.
   public selectionChanged() {
     const selectedCourseNames = this.selectedCourses().map(c => c.name);
+    this.selCoursesSvc.setNames(selectedCourseNames);
+
     this.mSvc.loadMeetings(selectedCourseNames);
 
     if (this.subscription) {
@@ -77,6 +82,10 @@ export class HomePage {
   }
 
   public addNewMeeting() {
-    this.nCtrl.navigateForward('new-meeting');
+    this.router.navigate(['/new-meeting']);
+  }
+
+  public addNewMeetingButtonDisabled() { 
+    return (this.selectedCourses().length === 0);
   }
 }

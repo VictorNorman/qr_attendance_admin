@@ -3,6 +3,7 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firest
 import { AngularFirestoreCollection } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { CoursesService, FirebaseCourseRecord } from './courses.service';
+import { firestore } from 'firebase/app';
 
 interface MeetingInfo {
   courseName: string;
@@ -60,17 +61,17 @@ export class MeetingsService {
       this.meetings = [];
       for (let courseInfo of coursesWithMeetings) {
         this.db.doc('/meetings/' + courseInfo.meetingsDoc.id).get().subscribe(res => {
-          const zeroth = res.get('0');
-          console.log('res = ', zeroth.length);
-          for (let i = 0; i < zeroth.length; i++) {
-            const mtg = zeroth[i];
+          const mtgsList = res.get('mtgs');
+          console.log('res = ', mtgsList.length);
+          for (let i = 0; i < mtgsList.length; i++) {  // foreach does not work for some reason.
+            const mtg = mtgsList[i];
             this.meetings.push({
               meetingId: courseInfo.meetingsDoc,
               courseName: courseInfo.name,
               date: mtg.timeGenerated.toString(),
               notes: mtg.notes,
               numberOfAttendees: 7,
-              qrEncodedString: mtg.qrEncodedString
+              qrEncodedString: mtg.qrCodeStr,
             });
           }
         });
@@ -80,18 +81,36 @@ export class MeetingsService {
     });
   }
 
-  //     // this.meetings = courseIds.map(courseId => {
-  //     //   let meetingCollection = this.db.collection<FirebaseCourseRecord>('courses/').doc<FirebaseMeetingRecord>(courseId);
-  //     //   meetingCollection.get().subscribe(doc => {
+  // You can add a new meeting for multiple courses at once -- like CS195 and CS295.
+  public addNewMeeting(selectedCourses: string[], notes: string, qrCodeStr: string) {
+    console.log('selectedCourses = ', selectedCourses);
+    this.cSvc.coursesSubj.subscribe(data => {
+      console.log('addNewMeeting: top, data = ', data);
+      if (!data) {
+        console.log('data is EMPTY!');
+        return;
+      }
+      const selectedCoursesInDb = data.filter((course) => {
+        console.log('course = ', course.name);
+        console.log('found in selectedCourses: ', selectedCourses.includes(course.name));
+        return selectedCourses.includes(course.name);
+      });
+      console.log('addNewMeeting: selCouIDB: ', selectedCoursesInDb);
 
-  //     //   })
-
-  //     });
-
-
-
-  //   });
-  // }
+      for (let courseInfo of selectedCoursesInDb) {
+        const docRef = this.db.doc('/meetings/' + courseInfo.meetingsDoc.id);
+        console.log('addNewMeeting: calling update on docRef: ', docRef);
+        docRef.update({
+          mtgs: firestore.FieldValue.arrayUnion({
+            notes,
+            qrCodeStr,
+            timeGenerated: new Date(),
+            submissions: [],
+          }),
+        });
+      }
+    });
+  }
 
 }
 

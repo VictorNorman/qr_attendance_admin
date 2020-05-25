@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MeetingsService } from 'src/app/services/meetings.service';
+import { ActivatedRoute } from '@angular/router';
+import { SelectedCoursesService } from 'src/app/services/selected-courses.service';
 
 @Component({
   selector: 'app-new-meeting',
@@ -12,14 +15,20 @@ export class NewMeetingPage implements OnInit {
   public notes = '';
   public duration = 3;    // minutes, by default
 
-  constructor() { }
+  constructor(
+    private mCtrl: MeetingsService,
+    private selCoursesSvc: SelectedCoursesService,
+  ) { }
 
   ngOnInit() {
   }
 
-  generateQRCode() {
-    if (this.qrEncodedString) {
-      this.qrGenerated = true;
+  generateQRCodeAndMeeting() {
+    if (! this.qrEncodedString) {
+      return;
     }
+    const selCourses = this.selCoursesSvc.getNames();
+    this.qrGenerated = true;
+    this.mCtrl.addNewMeeting(selCourses, this.notes, this.qrEncodedString);
   }
 }

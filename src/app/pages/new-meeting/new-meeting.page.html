@@ -1,5 +1,6 @@
 <ion-header>
   <ion-toolbar>
+    <ion-back-button></ion-back-button>
     <ion-title>Create New Meeting</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -7,24 +8,29 @@
 <ion-content>
   <ion-list>
     <ion-item>
-      <ion-label>Meeting Description / Notes</ion-label>
-      <ion-input type="textarea" [(ngModel)]="notes">
-      </ion-input>
+      <ion-label position="stacked">
+        <h1>Meeting Description / Notes</h1>
+      </ion-label>
+      <ion-textarea [(ngModel)]="notes">
+      </ion-textarea>
     </ion-item>
     <ion-item>
-      <ion-label>Text to encode in a QR</ion-label>
+      <ion-label position="stacked">
+        <h1>Text to encode in a QR</h1>
+      </ion-label>
       <ion-input type="password" [(ngModel)]="qrEncodedString"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label>(Optional) Close QR window automatically after: </ion-label>
+      <ion-label class="qr-code-duration-label">(Optional) Hide QR code automatically after: </ion-label>
       <ion-input type="number" placeholder="3" [(ngModel)]="duration"></ion-input>
       <ion-label>minutes</ion-label>
     </ion-item>
     <ion-item>
-      <ion-button (click)="generateQRCode()">Create and Display QR Code</ion-button>
+      <ion-button (click)="generateQRCodeAndMeeting()">Create and Display QR Code</ion-button>
     </ion-item>
-    <!-- debugging -->
-      <!-- {{qrEncodedString}} -->
   </ion-list>
-  <ngx-qrcode *ngIf="qrGenerated" [width]="700" [elementType]="'img'" [value]="qrEncodedString"></ngx-qrcode>
+  <div *ngIf="qrGenerated" class="qr-code-area">
+    <ngx-qrcode [width]="700" [elementType]="'img'" [value]="qrEncodedString"></ngx-qrcode>
+    <ion-button>Close</ion-button>
+  </div>
 </ion-content>
