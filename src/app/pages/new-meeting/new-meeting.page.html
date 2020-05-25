@@ -31,6 +31,6 @@
   </ion-list>
   <div *ngIf="qrGenerated" class="qr-code-area">
     <ngx-qrcode [width]="700" [elementType]="'img'" [value]="qrEncodedString"></ngx-qrcode>
-    <ion-button>Close</ion-button>
+    <ion-button (click)="close()">Close</ion-button>
   </div>
 </ion-content>

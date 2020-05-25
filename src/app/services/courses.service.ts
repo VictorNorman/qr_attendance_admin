@@ -36,6 +36,8 @@ export class CoursesService {
     this.courseCollection = this.db.collection<FirebaseCourseRecord[]>('courses');
 
     this.courseCollection.get().subscribe(q => {
+
+      console.log('😀😀😀😀😀: courses subscription fired');
       q.forEach(d => {
         this.courses.push({
           id: d.id,
@@ -54,7 +56,7 @@ export class CoursesService {
   async addNewCourse(name: string, adminEmail: string, password: string, notes: string) {
     // Create a new meetings document first, and get the id of it. Use that when 
     // creating the course. The document contains an array of meetings, which starts out empty.
-    const meetingsDocRef = await this.db.collection('meetings').add({});
+    const meetingsDocRef = await this.db.collection('meetings').add({mtgs: []});
 
     // Using add() will generate a unique document id.
     this.db.collection('courses').add({

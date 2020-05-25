@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CoursesService } from '../services/courses.service';
 import { ModalController } from '@ionic/angular';
 import { NewCourseModalPage } from '../page/new-course-modal/new-course-modal.page';
-import { MeetingsService } from '../services/meetings.service';
+import { MeetingsService, MeetingInfo } from '../services/meetings.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SelectedCoursesService } from '../services/selected-courses.service';
@@ -20,7 +20,7 @@ interface CourseInfo {
 export class HomePage {
 
   public courses: CourseInfo[] = [];
-  public meetings = [];
+  public meetings: MeetingInfo[] = [];
 
   private subscription: Subscription = null;
 
@@ -61,7 +61,6 @@ export class HomePage {
       this.subscription.unsubscribe();
     }
     this.subscription = this.mSvc.meetingsSubj.subscribe(m => {
-      console.log('selectionChanged: m = ', m);
       this.meetings = m;
     });
   }
@@ -72,12 +71,9 @@ export class HomePage {
     });
     await newCourseModal.present();
     const { data } = await newCourseModal.onDidDismiss();
-    // console.log('newCourseData = ', data);
     if (data.courseName !== '') {
       // call service to add new course data to db
       this.cSvc.addNewCourse(data.courseName, data.adminEmail, data.password, data.notes);
-
-      // TODO: force this page to update to show the new course.
     }
   }
 

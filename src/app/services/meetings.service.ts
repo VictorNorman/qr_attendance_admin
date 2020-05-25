@@ -4,11 +4,13 @@ import { AngularFirestoreCollection } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { CoursesService, FirebaseCourseRecord } from './courses.service';
 import { firestore } from 'firebase/app';
+import * as firebase from 'firebase';
+import Timestamp = firebase.firestore.Timestamp;
 
-interface MeetingInfo {
+export interface MeetingInfo {
   courseName: string;
   meetingId: any;     // a reference to a meeting document, I think.
-  date: string;       // timeGenerated in firebase.
+  date: string;       // field is timeGenerated in firebase.
   qrEncodedString: string;
   notes: string;
   numberOfAttendees: number;
@@ -52,23 +54,25 @@ export class MeetingsService {
       if (!data) {
         return;
       }
-      // only add courses with meetings.
-      const coursesWithMeetings = data.filter((course) => selectedCourses.includes(course.name) && course.meetingsDoc);
+      // only include selected courses in the data.
+      const coursesWithMeetings = data.filter((course) => selectedCourses.includes(course.name));
 
       // Seems to me that meetingsDoc is a Doc Reference, but I cannot use it as such...
       // So, I'll make a new one from the id.
-
       this.meetings = [];
       for (let courseInfo of coursesWithMeetings) {
-        this.db.doc('/meetings/' + courseInfo.meetingsDoc.id).get().subscribe(res => {
+        // for some reason, when there are no meetings yet in the document, courseInfo.meetingsDoc is 
+        // a string, but otherwise it is an object with the id in it.
+        const meetingDocId = (courseInfo.meetingsDoc.id || courseInfo.meetingsDoc);
+        this.db.doc('/meetings/' + meetingDocId).get().subscribe(res => {
           const mtgsList = res.get('mtgs');
-          console.log('res = ', mtgsList.length);
           for (let i = 0; i < mtgsList.length; i++) {  // foreach does not work for some reason.
             const mtg = mtgsList[i];
+            const ts = mtg.timeGenerated;
             this.meetings.push({
               meetingId: courseInfo.meetingsDoc,
               courseName: courseInfo.name,
-              date: mtg.timeGenerated.toString(),
+              date: this.convertTimestampToDate(ts).toLocaleString(),
               notes: mtg.notes,
               numberOfAttendees: 7,
               qrEncodedString: mtg.qrCodeStr,
@@ -81,9 +85,17 @@ export class MeetingsService {
     });
   }
 
+
+  // from https://stackoverflow.com/questions/34718668/firebase-timestamp-to-date-and-time.
+  // Probably is over-complicated.
+  convertTimestampToDate(timestamp: Timestamp | any): Date | any {
+    return timestamp instanceof Timestamp
+      ? new Timestamp(timestamp.seconds, timestamp.nanoseconds).toDate()
+      : timestamp;
+  }
+
   // You can add a new meeting for multiple courses at once -- like CS195 and CS295.
   public addNewMeeting(selectedCourses: string[], notes: string, qrCodeStr: string) {
-    console.log('selectedCourses = ', selectedCourses);
     this.cSvc.coursesSubj.subscribe(data => {
       console.log('addNewMeeting: top, data = ', data);
       if (!data) {
@@ -91,15 +103,15 @@ export class MeetingsService {
         return;
       }
       const selectedCoursesInDb = data.filter((course) => {
-        console.log('course = ', course.name);
-        console.log('found in selectedCourses: ', selectedCourses.includes(course.name));
         return selectedCourses.includes(course.name);
       });
       console.log('addNewMeeting: selCouIDB: ', selectedCoursesInDb);
 
       for (let courseInfo of selectedCoursesInDb) {
-        const docRef = this.db.doc('/meetings/' + courseInfo.meetingsDoc.id);
-        console.log('addNewMeeting: calling update on docRef: ', docRef);
+        // for some reason, when there are no meetings yet in the document, courseInfo.meetingsDoc is 
+        // a string, but otherwise it is an object with the id in it.
+        const meetingDocId = (courseInfo.meetingsDoc.id || courseInfo.meetingsDoc);
+        const docRef = this.db.doc('/meetings/' + meetingDocId);
         docRef.update({
           mtgs: firestore.FieldValue.arrayUnion({
             notes,

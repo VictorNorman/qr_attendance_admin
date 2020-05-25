@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MeetingsService } from 'src/app/services/meetings.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectedCoursesService } from 'src/app/services/selected-courses.service';
 
 @Component({
@@ -18,6 +18,7 @@ export class NewMeetingPage implements OnInit {
   constructor(
     private mCtrl: MeetingsService,
     private selCoursesSvc: SelectedCoursesService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -30,5 +31,9 @@ export class NewMeetingPage implements OnInit {
     const selCourses = this.selCoursesSvc.getNames();
     this.qrGenerated = true;
     this.mCtrl.addNewMeeting(selCourses, this.notes, this.qrEncodedString);
+  }
+
+  close() {
+    this.router.navigate(['/home']);
   }
 }
