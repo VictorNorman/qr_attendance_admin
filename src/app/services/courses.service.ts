@@ -56,7 +56,7 @@ export class CoursesService {
   async addNewCourse(name: string, adminEmail: string, password: string, notes: string) {
     // Create a new meetings document first, and get the id of it. Use that when 
     // creating the course. The document contains an array of meetings, which starts out empty.
-    const meetingsDocRef = await this.db.collection('meetings').add({mtgs: []});
+    const meetingsDocRef = await this.db.collection('meetings').doc(name).set({mtgs: []});
 
     // Using add() will generate a unique document id.
     this.db.collection('courses').add({
@@ -64,7 +64,6 @@ export class CoursesService {
       name,
       password,
       notes,
-      meetingsDoc: meetingsDocRef.id,
     });
   }
 }

@@ -55,14 +55,7 @@ export class HomePage {
     const selectedCourseNames = this.selectedCourses().map(c => c.name);
     this.selCoursesSvc.setNames(selectedCourseNames);
 
-    this.mSvc.loadMeetings(selectedCourseNames);
-
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    this.subscription = this.mSvc.meetingsSubj.subscribe(m => {
-      this.meetings = m;
-    });
+    this.meetings = this.mSvc.getMeetingsForCourses(selectedCourseNames);
   }
 
   public async openNewCourseModal() {
