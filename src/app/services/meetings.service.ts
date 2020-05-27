@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
-import { CoursesService, FirebaseCourseRecord } from './courses.service';
+import { CoursesService } from './courses.service';
 import { firestore } from 'firebase/app';
 import * as firebase from 'firebase';
 import Timestamp = firebase.firestore.Timestamp;
-import { map } from 'rxjs/operators';
 
 export interface MeetingInfo {
   courseName: string;
@@ -91,7 +89,6 @@ export class MeetingsService {
       for (let courseInfo of selectedCoursesInDb) {
         // for some reason, when there are no meetings yet in the document, courseInfo.meetingsDoc is 
         // a string, but otherwise it is an object with the id in it.
-        // const meetingDocId = (courseInfo.name;
         const docRef = this.db.doc('/meetings/' + courseInfo.name);
         docRef.update({
           mtgs: firestore.FieldValue.arrayUnion({
