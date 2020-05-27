@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CoursesService } from '../services/courses.service';
 import { ModalController } from '@ionic/angular';
-import { NewCourseModalPage } from '../page/new-course-modal/new-course-modal.page';
+import { NewCourseModalPage } from '../pages/new-course-modal/new-course-modal.page';
 import { MeetingsService, MeetingInfo } from '../services/meetings.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';

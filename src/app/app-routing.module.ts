@@ -13,7 +13,7 @@ const routes: Routes = [
   },
   {
     path: 'new-course-modal',
-    loadChildren: () => import('./page/new-course-modal/new-course-modal.module').then( m => m.NewCourseModalPageModule)
+    loadChildren: () => import('./pages/new-course-modal/new-course-modal.module').then( m => m.NewCourseModalPageModule)
   },
   {
     path: 'new-meeting',

@@ -25,7 +25,7 @@ interface FirebaseMeetingRecord {
   notes: string;
   qrCode: string;
   timeGenerated: Date;
-  submissions: FirebaseMeetingSubmissionRecord[];
+  submissionsId: any;
 }
 
 @Injectable({
@@ -62,12 +62,12 @@ export class MeetingsService {
   }
 
   public getMeetingsForCourses(courseNames: string[]): MeetingInfo[] {
-     return this.meetings.filter(m => courseNames.includes(m.courseName));
+    return this.meetings.filter(m => courseNames.includes(m.courseName));
   }
 
   // from https://stackoverflow.com/questions/34718668/firebase-timestamp-to-date-and-time.
   // Probably is over-complicated.
-  convertTimestampToDate(timestamp: Timestamp | any): Date | any {
+  private convertTimestampToDate(timestamp: Timestamp | any): Date | any {
     return timestamp instanceof Timestamp
       ? new Timestamp(timestamp.seconds, timestamp.nanoseconds).toDate()
       : timestamp;
@@ -75,7 +75,7 @@ export class MeetingsService {
 
   // You can add a new meeting for multiple courses at once -- like CS195 and CS295.
   public addNewMeeting(selectedCourseNames: string[], notes: string, qrCodeStr: string) {
-    this.cSvc.coursesSubj.subscribe(data => {
+    this.cSvc.coursesSubj.subscribe(async data => {
       console.log('addNewMeeting: top, data = ', data);
       if (!data) {
         console.log('data is EMPTY!');
@@ -86,6 +86,8 @@ export class MeetingsService {
       });
       console.log('addNewMeeting: selCouIDB: ', selectedCoursesInDb);
 
+      const submissionDocId = await this.db.collection('submissions').add({ submissions: [] });
+
       for (let courseInfo of selectedCoursesInDb) {
         // for some reason, when there are no meetings yet in the document, courseInfo.meetingsDoc is 
         // a string, but otherwise it is an object with the id in it.
@@ -95,7 +97,7 @@ export class MeetingsService {
             notes,
             qrCodeStr,
             timeGenerated: new Date(),
-            submissions: [],
+            submissionsId: submissionDocId,
           }),
         });
       }
