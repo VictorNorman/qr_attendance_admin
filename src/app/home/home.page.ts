@@ -3,7 +3,6 @@ import { CoursesService } from '../services/courses.service';
 import { ModalController } from '@ionic/angular';
 import { NewCourseModalPage } from '../pages/new-course-modal/new-course-modal.page';
 import { MeetingsService, MeetingInfo } from '../services/meetings.service';
-import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SelectedCoursesService } from '../services/selected-courses.service';
 
@@ -21,8 +20,6 @@ export class HomePage {
 
   public courses: CourseInfo[] = [];
   public meetings: MeetingInfo[] = [];
-
-  private subscription: Subscription = null;
 
   constructor(
     private cSvc: CoursesService,
@@ -44,18 +41,22 @@ export class HomePage {
         }
       });
     });
+    // Get notified when the list of meetings changes, and then go get the 
+    // new list for the selected courses.
+    this.mSvc.meetingsSubj.subscribe(data => {
+      this.meetings = this.mSvc.getMeetingsForCourses(this.selectedCourseNames());
+    });
   }
 
-  public selectedCourses(): CourseInfo[] {
-    return this.courses.filter(c => c.isChecked);
+  public selectedCourseNames(): string[] {
+    return this.courses.filter(c => c.isChecked).map(c => c.name);
   }
 
   // run each time the user clicks or unclicks a course.
   public selectionChanged() {
-    const selectedCourseNames = this.selectedCourses().map(c => c.name);
-    this.selCoursesSvc.setNames(selectedCourseNames);
-
-    this.meetings = this.mSvc.getMeetingsForCourses(selectedCourseNames);
+    const slc = this.selectedCourseNames();
+    this.selCoursesSvc.setNames(slc);
+    this.meetings = this.mSvc.getMeetingsForCourses(slc);
   }
 
   public async openNewCourseModal() {
@@ -75,6 +76,6 @@ export class HomePage {
   }
 
   public addNewMeetingButtonDisabled() { 
-    return (this.selectedCourses().length === 0);
+    return (this.selectedCourseNames().length === 0);
   }
 }

@@ -43,7 +43,7 @@ export class MeetingsService {
     this.db.collection('/meetings').snapshotChanges().subscribe(docChActions => {
       this.meetings = [];
       docChActions.forEach(dca => {
-        console.log('id ', dca.payload.doc.id, ' data ', dca.payload.doc.data());
+        // console.log('id ', dca.payload.doc.id, ' data ', dca.payload.doc.data());
         const mtgs: FirebaseMeetingRecord[] = dca.payload.doc.data()['mtgs'];
         mtgs.forEach(mtg => {
           this.meetings.push({
@@ -51,7 +51,7 @@ export class MeetingsService {
             date: this.convertTimestampToDate(mtg.timeGenerated).toLocaleString(),
             qrEncodedString: mtg.qrCode,
             notes: mtg.notes,
-            numberOfAttendees: 7,
+            numberOfAttendees: 7,   // TODO
           })
         })
       });
