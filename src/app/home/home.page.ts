@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { CoursesService } from '../services/courses.service';
-import { ModalController } from '@ionic/angular';
+import { ModalController, AlertController, ToastController } from '@ionic/angular';
 import { NewCourseModalPage } from '../pages/new-course-modal/new-course-modal.page';
 import { MeetingsService, MeetingInfo } from '../services/meetings.service';
 import { Router } from '@angular/router';
 import { SelectedCoursesService } from '../services/selected-courses.service';
+import { Papa } from 'ngx-papaparse';
+import { SubmissionService } from '../services/submission.service';
 
 interface CourseInfo {
   name: string;
@@ -25,8 +27,11 @@ export class HomePage {
     private cSvc: CoursesService,
     private mSvc: MeetingsService,
     private mCtrl: ModalController,
+    private sSvc: SubmissionService,
     private router: Router,
     private selCoursesSvc: SelectedCoursesService,
+    private papa: Papa,
+    private toastCtrl: ToastController,
   ) {
     // Get the list of courses from the service, once it has gotten them
     // from the database.
@@ -79,51 +84,57 @@ export class HomePage {
     return (this.selectedCourseNames().length === 0);
   }
 
+  private async presentToast(message) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 10000,
+    });
+    toast.present();
+  }
+
   public uploadCSV(event, meeting: MeetingInfo) {
     console.log('event = ', event);
 
     // https://cmatskas.com/importing-csv-files-using-jquery-and-html5/
-    const file = event.target.files[0];
-    console.log('file = ', file);
+    const orig_file = event.target.files[0];
+    console.log('file = ', orig_file.name);
     const reader = new FileReader();
     console.log('reader = ', reader);
-    reader.readAsText(file);
+    reader.readAsText(orig_file);
     reader.onload = (ev) => {
-      const csvData = ev.target.result;
-      console.log('csvData = ', csvData);
+      const csvData = ev.target.result as string;
+      this.papa.parse(csvData, {
+        complete: async (result) => {
+          // result is an object with data = array of arrays of strings.
+          const rows = result.data;
+          console.log('Orig rows = ', rows);
+          // [ Identifier, Full name, Email address, Status, Grade, Maximum Grade, etc. ]
+          // important fields are email address and grade.
+          const modifiedCsv = await this.sSvc.addGradesToMoodleCsv(rows, meeting.submissionsId);
+          console.log('😃modifiedCSV = ', modifiedCsv);
+          // tslint:disable-next-line:max-line-length
+          // From https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+          // Don't know how it works, but it works...
+          const element = document.createElement('a');
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.makeCsv(modifiedCsv)));
+          const nameWithoutCsv = orig_file.name.replace(/.csv$/, "");
+          const filename = `${nameWithoutCsv}-updated.csv`;
+          element.setAttribute('download', filename);
+
+          element.style.display = 'none';
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+          this.presentToast('Update attendance file downloaded to ' + filename);
+        }
+      });
     }
     reader.onerror = () => {
-      alert('Unable to read file ' + file.fileName);
+      alert('Unable to read file ' + orig_file.fileName);
     }
-
-    // const csvContents = this.makeCsv();
-
-    // // tslint:disable-next-line:max-line-length
-    // // From https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
-    // // Don't know how it works, but it works...
-    // const element = document.createElement('a');
-    // element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csvContents));
-    // element.setAttribute('download', `attendance-${meeting.date}.csv`);
-
-    // element.style.display = 'none';
-    // document.body.appendChild(element);
-    // element.click();
-    // document.body.removeChild(element);
   }
 
-  // private makeCsv(): string {
-  //   // tslint:disable-next-line:max-line-length
-  //   const header = `"Trail Id", "Completion Date", "Rating", "Step 1 %", "Step 2 %", "Step 3 %", "Step 4 %", "Step 5 %", "Total %"\n`;
-  //   const result = header + this.records.map((rec, idx) => {
-  //     // tslint:disable-next-line:max-line-length
-  //     let line = `${rec.trailId}, ${rec.dateCompleted}, ${rec.rating}, ${(rec.step1TimesRead)}, ${(rec.step2TimesRead)}, ${(rec.step3TimesRead)}, ${(rec.step4TimesRead)}, ${(rec.step5TimesRead)}, ${(rec.totalTimesRead).toFixed(3)},`;
-
-  //     // Add a blank line between each group of results: e.g., between the last 102 and first 103 lines.
-  //     if (idx > 1 && rec.trailId !== this.records[idx - 1].trailId) {
-  //       line = '\n' + line;
-  //     }
-  //     return line;
-  //   }).join('\n');
-  //   return result;
-  // }
+  private makeCsv(rows: string[][]): string {
+    return this.papa.unparse(rows);
+  }
 }

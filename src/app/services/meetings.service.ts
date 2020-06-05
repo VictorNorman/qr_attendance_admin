@@ -13,6 +13,7 @@ export interface MeetingInfo {
   qrEncodedString: string;
   notes: string;
   numberOfAttendees: number;
+  submissionsId: string;
 }
 
 interface FirebaseMeetingSubmissionRecord {
@@ -55,6 +56,7 @@ export class MeetingsService {
             qrEncodedString: mtg.qrCodeStr,
             notes: mtg.notes,
             numberOfAttendees: await this.sSvc.getNumSubmissionsForMeeting(mtg.submissionsId),
+            submissionsId: mtg.submissionsId,
           });
         });
       });

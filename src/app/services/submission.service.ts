@@ -33,4 +33,33 @@ export class SubmissionService {
       });
     });
   }
+
+  private getSubmissionsForMeeting(submissionsId: string) {
+    return new Promise<FirebaseMeetingSubmissionRecord[]>((resolve) => {
+      this.db.doc(submissionsId).get().subscribe((data) => {
+        const submissions = data.data()["submissions"] as FirebaseMeetingSubmissionRecord[];
+        return resolve(submissions);
+      });
+    });
+
+  }
+
+  private emailFoundInSubmissions(subs: FirebaseMeetingSubmissionRecord[], email) {
+    return subs.some(s => s.userId === email);
+  }
+
+  async addGradesToMoodleCsv(rows: string[][], submissionsId: string): Promise<string[][]> {
+    // Each rows has format:
+    // [ Identifier, Full name, Email address, Status, Grade, Maximum Grade, etc. ]
+    // important fields are email address and grade.
+    // 0th row is header row.
+    const subs = await this.getSubmissionsForMeeting(submissionsId);
+    for (let i = 0; i < rows.length; i++) {
+      if (this.emailFoundInSubmissions(subs, rows[i][2])) {
+        console.log(`Found ${rows[i][2]} in submissions. Setting grade to 1`);
+        rows[i][4] = "1";     // they get credit for attending.
+      }
+    }
+    return rows;
+  }
 }

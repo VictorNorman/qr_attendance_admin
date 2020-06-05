@@ -12,13 +12,14 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { firebaseConfig } from './credentials';
 import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
+import { Papa } from 'ngx-papaparse';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
-    BrowserModule, 
-    IonicModule.forRoot(), 
+    BrowserModule,
+    IonicModule.forRoot(),
     AppRoutingModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
@@ -27,8 +28,9 @@ import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
   providers: [
     StatusBar,
     SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    Papa
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
