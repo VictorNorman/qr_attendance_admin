@@ -38,7 +38,9 @@
 
         <div *ngIf="meetings">
           <ion-item *ngFor="let meeting of meetings">
-            {{meeting.courseName + ' - ' + meeting.notes + ' - ' + meeting.date + ' - ' + meeting.numberOfAttendees}}
+            {{meeting.courseName + ' - ' + meeting.notes + ' - ' + meeting.date + ' - ' + meeting.numberOfAttendees + ' submissions '}}
+            Moodle Gradebook File Upload
+            <input id="txtFileUpload" type="file" accept=".csv" (change)="uploadCSV($event, meeting)" />
           </ion-item>
         </div>
       </ion-col>

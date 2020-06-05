@@ -31,7 +31,7 @@ export class HomePage {
     // Get the list of courses from the service, once it has gotten them
     // from the database.
     this.cSvc.coursesSubj.subscribe(data => {
-      if (! data) {
+      if (!data) {
         return;
       }
       this.courses = data.map<CourseInfo>(course => {
@@ -75,7 +75,55 @@ export class HomePage {
     this.router.navigate(['/new-meeting']);
   }
 
-  public addNewMeetingButtonDisabled() { 
+  public addNewMeetingButtonDisabled() {
     return (this.selectedCourseNames().length === 0);
   }
+
+  public uploadCSV(event, meeting: MeetingInfo) {
+    console.log('event = ', event);
+
+    // https://cmatskas.com/importing-csv-files-using-jquery-and-html5/
+    const file = event.target.files[0];
+    console.log('file = ', file);
+    const reader = new FileReader();
+    console.log('reader = ', reader);
+    reader.readAsText(file);
+    reader.onload = (ev) => {
+      const csvData = ev.target.result;
+      console.log('csvData = ', csvData);
+    }
+    reader.onerror = () => {
+      alert('Unable to read file ' + file.fileName);
+    }
+
+    // const csvContents = this.makeCsv();
+
+    // // tslint:disable-next-line:max-line-length
+    // // From https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+    // // Don't know how it works, but it works...
+    // const element = document.createElement('a');
+    // element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csvContents));
+    // element.setAttribute('download', `attendance-${meeting.date}.csv`);
+
+    // element.style.display = 'none';
+    // document.body.appendChild(element);
+    // element.click();
+    // document.body.removeChild(element);
+  }
+
+  // private makeCsv(): string {
+  //   // tslint:disable-next-line:max-line-length
+  //   const header = `"Trail Id", "Completion Date", "Rating", "Step 1 %", "Step 2 %", "Step 3 %", "Step 4 %", "Step 5 %", "Total %"\n`;
+  //   const result = header + this.records.map((rec, idx) => {
+  //     // tslint:disable-next-line:max-line-length
+  //     let line = `${rec.trailId}, ${rec.dateCompleted}, ${rec.rating}, ${(rec.step1TimesRead)}, ${(rec.step2TimesRead)}, ${(rec.step3TimesRead)}, ${(rec.step4TimesRead)}, ${(rec.step5TimesRead)}, ${(rec.totalTimesRead).toFixed(3)},`;
+
+  //     // Add a blank line between each group of results: e.g., between the last 102 and first 103 lines.
+  //     if (idx > 1 && rec.trailId !== this.records[idx - 1].trailId) {
+  //       line = '\n' + line;
+  //     }
+  //     return line;
+  //   }).join('\n');
+  //   return result;
+  // }
 }
