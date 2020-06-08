@@ -49,7 +49,16 @@ export class HomePage {
     // Get notified when the list of meetings changes, and then go get the 
     // new list for the selected courses.
     this.mSvc.meetingsSubj.subscribe(data => {
-      this.meetings = this.mSvc.getMeetingsForCourses(this.selectedCourseNames());
+      // console.log('home: meetings changed: selectedCourses are', this.selectedCourseNames());
+      // Ugh!  I hate this stuff.  If you don't delay the getting of meeitngs for selected
+      // courses, then there is a race condition between the code that adds the new meeting
+      // and this code.  The result is this.meetings in meetings.service.ts is an empty list
+      // when getMeetingsForCourses() is run, so you get back an empty result. This 1 second
+      // delay fixes it.  But, ugh.
+      setTimeout(() => {
+        this.meetings = this.mSvc.getMeetingsForCourses(this.selectedCourseNames());
+      }, 1000);
+      // console.log('this.meetings now', this.meetings);
     });
   }
 
@@ -80,14 +89,14 @@ export class HomePage {
     this.router.navigate(['/new-meeting']);
   }
 
-  public addNewMeetingButtonDisabled() {
+  public noCoursesSelected() {
     return (this.selectedCourseNames().length === 0);
   }
 
   private async presentToast(message) {
     const toast = await this.toastCtrl.create({
       message,
-      duration: 10000,
+      duration: 5000,
     });
     toast.present();
   }
@@ -125,7 +134,7 @@ export class HomePage {
           document.body.appendChild(element);
           element.click();
           document.body.removeChild(element);
-          this.presentToast('Update attendance file downloaded to ' + filename);
+          this.presentToast('Updated attendance file downloaded to ' + filename);
         }
       });
     }
@@ -136,5 +145,9 @@ export class HomePage {
 
   private makeCsv(rows: string[][]): string {
     return this.papa.unparse(rows);
+  }
+
+  public deleteMeeting(meeting: MeetingInfo) {
+    this.mSvc.deleteMeeting(meeting);
   }
 }

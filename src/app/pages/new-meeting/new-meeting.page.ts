@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MeetingsService } from 'src/app/services/meetings.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { SelectedCoursesService } from 'src/app/services/selected-courses.service';
 
 @Component({
@@ -25,7 +25,7 @@ export class NewMeetingPage implements OnInit {
   }
 
   generateQRCodeAndMeeting() {
-    if (! this.qrEncodedString) {
+    if (!this.qrEncodedString) {
       return;
     }
     const selCourses = this.selCoursesSvc.getNames();

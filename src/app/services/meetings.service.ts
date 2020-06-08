@@ -13,7 +13,7 @@ export interface MeetingInfo {
   qrEncodedString: string;
   notes: string;
   numberOfAttendees: number;
-  submissionsId: string;
+  submissionsId: any;    // see comment below about submissionsIds
 }
 
 interface FirebaseMeetingSubmissionRecord {
@@ -27,7 +27,7 @@ interface FirebaseMeetingRecord {
   notes: string;
   qrCodeStr: string;
   timeGenerated: Date;
-  submissionsId: string;
+  submissionsId: any;     // these things are weird: they look like strings but are objects.
 }
 
 @Injectable({
@@ -42,13 +42,14 @@ export class MeetingsService {
     private cSvc: CoursesService,
     private sSvc: SubmissionService
   ) {
+
     this.db.collection("/meetings").snapshotChanges().subscribe(docChActions => {
       this.meetings = [];
       docChActions.forEach(dca => {
-        // console.log('id ', dca.payload.doc.id, ' data ', dca.payload.doc.data());
+        console.log('id ', dca.payload.doc.id, ' data ', dca.payload.doc.data());
         const mtgs: FirebaseMeetingRecord[] = dca.payload.doc.data()["mtgs"];
         mtgs.forEach(async (mtg) => {
-          console.log("LOOKING AT mtg", mtg);
+          // console.log("LOOKING AT mtg", mtg);
           const courseName = dca.payload.doc.id as string;
           this.meetings.push({
             courseName,
@@ -60,14 +61,14 @@ export class MeetingsService {
           });
         });
       });
-      console.log("All meetings = ", this.meetings);
+      console.log("mSvc: All meetings = ", this.meetings);
       // Tell all subscribers that the data has arrived.
       this.meetingsSubj.next(this.meetings);
     });
   }
 
   public getMeetingsForCourses(courseNames: string[]): MeetingInfo[] {
-    return this.meetings.filter((m) => courseNames.includes(m.courseName));
+    return this.meetings.filter(m => courseNames.includes(m.courseName));
   }
 
   // from https://stackoverflow.com/questions/34718668/firebase-timestamp-to-date-and-time.
@@ -81,7 +82,7 @@ export class MeetingsService {
   // You can add a new meeting for multiple courses at once -- like CS195 and CS295.
   public addNewMeeting(selectedCourseNames: string[], notes: string, qrCodeStr: string) {
     this.cSvc.coursesSubj.subscribe(async (data) => {
-      console.log("addNewMeeting: top, data = ", data);
+      // console.log("addNewMeeting: top, data = ", data);
       if (!data) {
         console.log("data is EMPTY!");
         return;
@@ -89,13 +90,10 @@ export class MeetingsService {
       const selectedCoursesInDb = data.filter((course) => {
         return selectedCourseNames.includes(course.name);
       });
-      console.log("addNewMeeting: selCouIDB: ", selectedCoursesInDb);
-
-      const submissionDocId = await this.db.collection("submissions").add({ submissions: [] });
+      // console.log("addNewMeeting: selCouIDB: ", selectedCoursesInDb);
 
       for (let courseInfo of selectedCoursesInDb) {
-        // for some reason, when there are no meetings yet in the document, courseInfo.meetingsDoc is
-        // a string, but otherwise it is an object with the id in it.
+        const submissionDocId = await this.sSvc.addNewSubmissionsDoc();
         const docRef = this.db.doc("/meetings/" + courseInfo.name);
         docRef.update({
           mtgs: firestore.FieldValue.arrayUnion({
@@ -108,4 +106,24 @@ export class MeetingsService {
       }
     });
   }
+
+  public async deleteMeeting(meeting: MeetingInfo) {
+
+    await this.sSvc.deleteSubmissions(meeting.submissionsId);
+
+    this.db.doc('/meetings/' + meeting.courseName).get().subscribe(o => {
+      const mtgs: FirebaseMeetingRecord[] = o.data().mtgs;
+      for (let i = 0; i < mtgs.length; i++) {
+        if (mtgs[i].submissionsId.id === meeting.submissionsId.id) {
+          const obj2del = mtgs[i];
+          // console.log('obj2del = ', obj2del);
+          this.db.doc("/meetings/" + meeting.courseName).update({
+            mtgs: firestore.FieldValue.arrayRemove(obj2del),
+          });
+          return;
+        }
+      }
+    });
+  }
+
 }

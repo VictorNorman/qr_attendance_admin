@@ -25,9 +25,10 @@ export class SubmissionService {
     private db: AngularFirestore,
   ) { }
 
-  getNumSubmissionsForMeeting(submissionsId: string) {
+  getNumSubmissionsForMeeting(submissionsId) {
+    console.log('getting num subissions for', submissionsId.id);
     return new Promise<number>((resolve) => {
-      this.db.doc(submissionsId).get().subscribe((data) => {
+      this.db.doc(submissionsId).get().subscribe(data => {
         const submissions = data.data()["submissions"] as FirebaseMeetingSubmissionRecord[];
         return resolve(submissions.length);
       });
@@ -61,5 +62,14 @@ export class SubmissionService {
       }
     }
     return rows;
+  }
+
+  public async addNewSubmissionsDoc() {
+    return await this.db.collection("submissions").add({ submissions: [] });
+  }
+
+  public async deleteSubmissions(submissionsId: string) {
+    // console.log('deleting all submissions for id ', submissionsId);
+    await this.db.doc(submissionsId).delete();
   }
 }
