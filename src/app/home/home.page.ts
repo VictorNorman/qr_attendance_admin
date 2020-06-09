@@ -32,6 +32,7 @@ export class HomePage {
     private selCoursesSvc: SelectedCoursesService,
     private papa: Papa,
     private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
   ) {
     // Get the list of courses from the service, once it has gotten them
     // from the database.
@@ -147,7 +148,26 @@ export class HomePage {
     return this.papa.unparse(rows);
   }
 
-  public deleteMeeting(meeting: MeetingInfo) {
-    this.mSvc.deleteMeeting(meeting);
+  public async deleteMeeting(meeting: MeetingInfo) {
+    const alert = await this.alertCtrl.create({
+      cssClass: 'my-custom-class',
+      header: 'Confirm!',
+      message: 'Do you really want to delete the meeting and all attendance submissions?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+          }
+        }, {
+          text: 'Yes',
+          handler: () => {
+            this.mSvc.deleteMeeting(meeting);
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 }
