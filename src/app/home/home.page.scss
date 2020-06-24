@@ -10,3 +10,45 @@
 .show-border {
   border: 1px solid  white;
 }
+
+.list-header {
+  --background: steelblue;
+  border-radius: 15px 0px 0 0;
+}
+
+.list-item {
+  border-left: 2px solid steelblue;
+  border-right: 2px solid steelblue;
+}
+
+.list-item:nth-child(odd) {
+  --background: lightgrey;
+}
+
+.odd-row {
+  --background: lightgrey;
+}
+
+.list-item:last-child {
+  border-radius: 0px 0px 15px 0px;
+  border-bottom: 2px solid steelblue;
+}
+
+h2 {
+  margin-top: 10px;
+}
+
+ion-col {
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.meeting-header-col {
+  padding: 0px;
+}
+
+// otherwise part of the item overwrites the rounded border in the lower right.
+.trash-item.last-row {
+  border-radius: 0 0 15px 0;
+}

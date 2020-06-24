@@ -170,4 +170,11 @@ export class HomePage {
     });
     await alert.present();
   }
+
+  computeClasses(rowIndex: number, numRows: number) {
+    return {
+      'odd-row': (rowIndex % 2 === 0),
+      'last-row': (rowIndex === numRows - 1),
+    };
+  }
 }
