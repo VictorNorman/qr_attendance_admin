@@ -11,7 +11,7 @@ export class NewCourseModalPage implements OnInit {
   public courseName = '';
   public adminEmail = '';
   public password = '';
-  public notes = '';
+  public description = '';
 
   constructor(private mCtrl: ModalController) { }
 
@@ -22,8 +22,8 @@ export class NewCourseModalPage implements OnInit {
     this.mCtrl.dismiss({
       courseName: this.courseName,
       adminEmail: this.adminEmail,
-      password: this.password,
-      notes: this.notes,
+      password: this.password,      // not used right now.
+      description: this.description,
     });
   }
 

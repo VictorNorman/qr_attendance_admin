@@ -14,13 +14,13 @@
       <ion-label>Admin Email Address</ion-label>
       <ion-input type="text" [(ngModel)]="adminEmail"></ion-input>
     </ion-item>
-    <ion-item>
-      <ion-label>Password</ion-label>
+    <!-- <ion-item>
+      <ion-label>Password (stored in cleartext)</ion-label>
       <ion-input type="password" [(ngModel)]="password"></ion-input>
-    </ion-item>
+    </ion-item> -->
     <ion-item>
-      <ion-label>Notes</ion-label>
-      <ion-input type="text" [(ngModel)]="notes"></ion-input>
+      <ion-label>Course Description</ion-label>
+      <ion-input type="text" [(ngModel)]="description"></ion-input>
     </ion-item>
     <ion-item>
       <ion-button (click)="done()">

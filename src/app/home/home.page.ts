@@ -47,7 +47,7 @@ export class HomePage {
         }
       });
     });
-    // Get notified when the list of meetings changes, and then go get the 
+    // Get notified when the list of meetings changes, and then go get the
     // new list for the selected courses.
     this.mSvc.meetingsSubj.subscribe(data => {
       // console.log('home: meetings changed: selectedCourses are', this.selectedCourseNames());
@@ -82,7 +82,7 @@ export class HomePage {
     const { data } = await newCourseModal.onDidDismiss();
     if (data.courseName !== '') {
       // call service to add new course data to db
-      this.cSvc.addNewCourse(data.courseName, data.adminEmail, data.password, data.notes);
+      this.cSvc.addNewCourse(data.courseName, data.adminEmail, data.password, data.description);
     }
   }
 

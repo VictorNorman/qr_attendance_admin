@@ -6,7 +6,7 @@ export interface FirebaseCourseRecord {
   adminEmail: string;
   password: string;
   name: string;
-  notes: string;
+  description: string;
 }
 
 @Injectable({
@@ -29,7 +29,7 @@ export class CoursesService {
         this.courses.push({
           name: course.name,
           adminEmail: course.adminEmail,
-          notes: course.notes,
+          description: course.description,
           password: course.password,
         });
       });
@@ -38,8 +38,8 @@ export class CoursesService {
     });
   }
 
-  async addNewCourse(name: string, adminEmail: string, password: string, notes: string) {
-    // Create a new meetings document first, and get the id of it. Use that when 
+  async addNewCourse(name: string, adminEmail: string, password: string, description: string) {
+    // Create a new meetings document first, and get the id of it. Use that when
     // creating the course. The document contains an array of meetings, which starts out empty.
     const meetingsDocRef = await this.db.collection('meetings').doc(name).set({ mtgs: [] });
 
@@ -48,7 +48,7 @@ export class CoursesService {
       adminEmail,
       name,
       password,
-      notes,
+      description,
     });
   }
 }
